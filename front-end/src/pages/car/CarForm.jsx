@@ -16,6 +16,8 @@ import myfetch from '../../lib/myfetch'
 import useConfirmDialog from '../../ui/useConfirmDialog'
 import useNotification from '../../ui/useNotification'
 import useWaiting from '../../ui/useWaiting'
+import Cars from '../../models/Cars'
+import { ZodError } from 'zod'
 
 export default function CarForm() {
   /*
@@ -96,7 +98,17 @@ export default function CarForm() {
     showWaiting(true); // Exibe a tela de espera
     try {
 
-      if(car.selling_price === '') car.selling_price = null
+      if (car.selling_price !== null && car.selling_price !== '') {
+        car.selling_price = parseFloat(car.selling_price)
+      } else {
+        car.selling_price = undefined // ou null, dependendo do que você quer
+      }
+
+
+      // Invoca a validação do Zod
+      Cars.parse(car)
+
+      if (car.selling_price === '') car.selling_price = null
 
       // Se houver parâmetro na rota, significa que estamos modificando
       // um cliente já existente. A requisição será enviada ao back-end
@@ -111,10 +123,22 @@ export default function CarForm() {
       notify('Item salvo com sucesso.', 'success', 4000, () => {
         navigate('..', { relative: 'path', replace: true })
       })
-    } catch (error) {
+    }
+    catch (error) {
       console.error(error)
-      notify(error.message, 'error')
-    } finally {
+
+      // Em caso de erro do Zod, preenchemos a variável de estado
+      // inputErrors com os erros para depois exibir abaixo de cada
+      // campo de entrada
+      if (error instanceof ZodError) {
+        const errorMessages = {}
+        for (let i of error.issues) errorMessages[i.path[0]] = i.message
+        setState({ ...state, inputErrors: errorMessages })
+        notify('Há campos com valores inválidos. Verifique.', 'error')
+      }
+      else notify(error.message, 'error')
+    }
+    finally {
       // Desliga a tela de espera, seja em caso de sucesso, seja em caso de erro
       showWaiting(false)
     }
@@ -142,14 +166,14 @@ export default function CarForm() {
 
       // Se houver parâmetro na rota, precisamos buscar o carro para
       // ser editado
-      if(params.id) {
+      if (params.id) {
 
         car = await myfetch.get(`/cars/${params.id}`)
 
         // Converte o formato de data armazenado no banco de dados
         // para o formato reconhecido pelo componente DatePicker
-        
-        if(car.selling_date) {
+
+        if (car.selling_date) {
           car.selling_date = parseISO(car.selling_date)
         }
       }
@@ -178,8 +202,8 @@ export default function CarForm() {
   }
 
   function handleKeyDown(event) {
-    if(event.key === 'Delete') {
-      const stateCopy = {...state}
+    if (event.key === 'Delete') {
+      const stateCopy = { ...state }
       stateCopy.car.customer_id = null
       setState(stateCopy)
     }
@@ -206,7 +230,7 @@ export default function CarForm() {
             value={car.brand}
             onChange={handleFieldChange}
             helperText={inputErrors?.brand}
-            error={inputErrors?.brand}
+            error={Boolean(inputErrors?.brand)}
           />
           <TextField
             name='model'
@@ -217,7 +241,7 @@ export default function CarForm() {
             value={car.model}
             onChange={handleFieldChange}
             helperText={inputErrors?.model}
-            error={inputErrors?.model}
+            error={Boolean(inputErrors?.model)}
           />
 
           <TextField
@@ -230,7 +254,7 @@ export default function CarForm() {
             onChange={handleFieldChange}
             select
             helperText={inputErrors?.state}
-            error={inputErrors?.state}
+            error={Boolean(inputErrors?.state)}
           >
             {colors.map((s) => (
               <MenuItem key={s.value} value={s.value}>
@@ -249,7 +273,7 @@ export default function CarForm() {
             value={car.year_manufacture}
             onChange={handleFieldChange}
             helperText={inputErrors?.year_manufacture}
-            error={inputErrors?.year_manufacture}
+            error={Boolean(inputErrors?.year_manufacture)}
           >
             {years.map((year) => (
               <MenuItem key={year} value={year}>
@@ -289,7 +313,7 @@ export default function CarForm() {
                 required
                 fullWidth
                 helperText={inputErrors?.phone}
-                error={inputErrors?.phone}
+                error={Boolean(inputErrors?.phone)}
               />
             )}
           </InputMask>
@@ -311,7 +335,7 @@ export default function CarForm() {
                   variant: 'filled',
                   fullWidth: true,
                   helperText: inputErrors?.selling_date,
-                  error: inputErrors?.selling_date,
+                  error: Boolean(inputErrors?.selling_date),
                 },
               }}
             />
@@ -326,7 +350,7 @@ export default function CarForm() {
             value={car.selling_price}
             onChange={handleFieldChange}
             helperText={inputErrors?.selling_price}
-            error={inputErrors?.selling_price}
+            error={Boolean(inputErrors?.selling_price)}
           />
 
           <TextField
@@ -340,7 +364,7 @@ export default function CarForm() {
             onKeyDown={handleKeyDown}
             select
             helperText={inputErrors?.customer_id || 'Tecle DEL para limpar o cliente'}
-            error={inputErrors?.customer_id}
+            error={Boolean(inputErrors?.customer_id)}
           >
             {customers.map((c) => (
               <MenuItem key={c.id} value={c.id}>
