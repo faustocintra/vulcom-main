@@ -1,26 +1,56 @@
-import dotenv from 'dotenv'
-dotenv.config() // Carrega as variáveis de ambiente do arquivo .env
+import dotenv from "dotenv";
+dotenv.config(); // Carrega as variáveis de ambiente do arquivo .env
 
-import express, { json, urlencoded } from 'express'
-import cookieParser from 'cookie-parser'
-import logger from 'morgan'
+import express, { json, urlencoded } from "express";
+import cookieParser from "cookie-parser";
+import logger from "morgan";
+import cors from "cors";
 
-const app = express()
+const app = express();
 
-app.use(logger('dev'))
-app.use(json())
-app.use(urlencoded({ extended: false }))
-app.use(cookieParser())
+// Desabilita o cabeçalho X-Powered-By para dificultar a identificação
+// da tecnologia na qual o back-end foi desenvolvido
+app.disable('x-powered-by')
+
+app.use(logger("dev"));
+app.use(json());
+app.use(urlencoded({ extended: false }));
+app.use(cookieParser());
+// Configurando o CORS para que o back-end aceite
+// requisições vindas das origens indicadas pela
+// variável de ambiente ALLOWED_ORIGINS
+app.use(
+    cors({
+        origin: process.env.ALLOWED_ORIGINS.split(","),
+        // Envia de fato quaisquer cookies gerados para o front-end
+        credentials: true,
+    })
+);
+
+// Rate limiter: limita a quantidade de requisições que cada usuário/IP
+// pode efetuar dentro de um determinado intervalo de tempo
+import { rateLimit } from 'express-rate-limit'
+
+const limiter = rateLimit({
+  windowMs: 60 * 1000,    // Intervalo: 1 minuto
+  limit: 20               // Máximo de 20 requisições
+})
+
+app.use(limiter)
 
 /*********** ROTAS DA API **************/
 
-import carsRouter from './routes/cars.js'
-app.use('/cars', carsRouter)
+// Middleware de verificação do token de autorização
+import auth from "./middleware/auth.js";
+app.use(auth);
 
-import customersRouter from './routes/customers.js'
-app.use('/customers', customersRouter)
+import carsRouter from "./routes/cars.js";
+app.use("/cars", carsRouter);
 
-import usersRouter from './routes/users.js'
-app.use('/users', usersRouter)
+import customersRouter from "./routes/customers.js";
+app.use("/customers", customersRouter);
 
-export default app
+import usersRouter from "./routes/users.js";
+app.use("/users", usersRouter);
+
+export default app;
