@@ -64,4 +64,10 @@ model User {
   updated_cars      Car[]         @relation("updated_user")
 }
 
+// Dados do desafio de XSS. A saída sem escape fica restrita à tela didática.
+model XssComment {
+  id         Int      @id @default(autoincrement())
+  content    String
+  created_at DateTime @default(now())
+}
 

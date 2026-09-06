@@ -35,6 +35,18 @@ export default function MainMenu() {
       authLevel: 0
     },
     {
+      children: 'Desafio: XSS',
+      to: '/challenges/xss',
+      divider: false,
+      authLevel: 0
+    },
+    {
+      children: 'Desafio: SQL Injection',
+      to: '/challenges/sqli',
+      divider: true,
+      authLevel: 0
+    },
+    {
       children: 'Listagem de veículos',
       to: '/cars',
       divider: false,
@@ -115,5 +127,4 @@ export default function MainMenu() {
     </div>
   );
 }
-
 

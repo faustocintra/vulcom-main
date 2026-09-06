@@ -20,6 +20,11 @@ const colors = [
 ]
 
 async function main() {
+  // Comentário inicial do desafio de XSS
+  await prisma.xssComment.create({
+    data: { content: 'Bem-vindo ao desafio de XSS!' }
+  })
+
   // Criar usuários
   const users = [];
   const numberOfUsers = 4;

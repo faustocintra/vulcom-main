@@ -13,12 +13,17 @@ import UserList from '../pages/user/UserList'
 import UserForm from '../pages/user/UserForm'
 
 import Login from '../pages/Login'
+import XssChallenge from '../pages/challenges/XssChallenge'
+import SqliChallenge from '../pages/challenges/SqliChallenge'
 
 export default function AppRoutes() {
   return <Routes>
     <Route path="/" element={ <Homepage /> } />
 
     <Route path="/login" element={ <Login /> } />
+
+    <Route path="/challenges/xss" element={ <XssChallenge /> } />
+    <Route path="/challenges/sqli" element={ <SqliChallenge /> } />
 
     <Route path="/cars" element={ <CarList /> } />
     <Route path="/cars/new" element={ <CarForm /> } />
