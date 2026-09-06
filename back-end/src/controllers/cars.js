@@ -38,6 +38,8 @@ controller.retrieveAll = async function(req, res) {
       ],
       include: {
         customer: includedRels.includes('customer'),
+        // OWASP Top 10:2025 A01 - Falha no Controle de Acesso:
+        // incluir usuários retorna todos os seus campos, inclusive password em texto puro (A04).
         created_user: includedRels.includes('created_user'),
         updated_user: includedRels.includes('updated_user')
       }
@@ -63,6 +65,8 @@ controller.retrieveOne = async function(req, res) {
       where: { id: Number(req.params.id) },
       include: {
         customer: includedRels.includes('customer'),
+        // OWASP Top 10:2025 A01 - Falha no Controle de Acesso:
+        // a consulta individual também expõe password dos usuários relacionados (A04).
         created_user: includedRels.includes('created_user'),
         updated_user: includedRels.includes('updated_user')
       }
@@ -84,6 +88,10 @@ controller.retrieveOne = async function(req, res) {
 controller.update = async function(req, res) {
   try {
 
+    // OWASP Top 10:2025 A01 - Falha no Controle de Acesso:
+    // atribuição em massa permite adulterar created_user_id e updated_user_id.
+    // OWASP Top 10:2025 A06 - Design Inseguro:
+    // faltam regras de negócio para a venda; selling_price aceita valores negativos.
     const result = await prisma.car.update({
       where: { id: Number(req.params.id) },
       data: req.body

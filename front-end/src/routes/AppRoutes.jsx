@@ -16,6 +16,8 @@ import Login from '../pages/Login'
 import XssChallenge from '../pages/challenges/XssChallenge'
 import SqliChallenge from '../pages/challenges/SqliChallenge'
 
+// OWASP Top 10:2025 A01 - Falha no Controle de Acesso:
+// as rotas de cadastros não aplicam AuthGuard e podem ser abertas diretamente pela URL.
 export default function AppRoutes() {
   return <Routes>
     <Route path="/" element={ <Homepage /> } />

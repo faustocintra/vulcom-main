@@ -35,6 +35,8 @@ async function main() {
       fullname: 'Administrador do Sistema',
       username: 'admin',
       email: 'admin@vulcom.com.br',
+      // OWASP Top 10:2025 A07 - Falhas de Autenticação: credencial inicial fixa e conhecida.
+      // OWASP Top 10:2025 A04 - Falhas de Criptografia: senha persistida em texto puro.
       password: 'Vulcom@DSM',
       is_admin: true
     }
@@ -47,6 +49,7 @@ async function main() {
         fullname: faker.person.fullName(),
         username: faker.internet.username(),
         email: faker.internet.email(),
+        // OWASP Top 10:2025 A07 - Falhas de Autenticação: senha fraca e compartilhada entre contas.
         password: 'senha123',
         is_admin: i === 0,
       },

@@ -105,6 +105,8 @@ export default function MainMenu() {
       >
         {
           menuItems.map(item => {
+            // OWASP Top 10:2025 A01 - Falha no Controle de Acesso:
+            // esconder itens do menu não impede acesso direto às páginas ou à API sem autorização.
             if(
               (item.authLevel === 0) ||
               (item.authLevel === 1 && authUser) ||

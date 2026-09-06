@@ -19,6 +19,8 @@ app.set('port', port)
  * Create HTTP server.
  */
 
+// OWASP Top 10:2025 A04 - Falhas de Criptografia:
+// este servidor usa HTTP; acesso direto sem TLS em um proxy expõe credenciais e tokens em trânsito.
 const server = createServer(app)
 
 /**

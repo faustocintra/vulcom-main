@@ -18,6 +18,8 @@ controller.retrieveComments = async function(req, res) {
 
 controller.createComment = async function(req, res) {
   try {
+    // OWASP Top 10:2025 A05 - Injeção (XSS armazenado):
+    // o conteúdo é persistido sem sanitização e depois interpretado como HTML em XssChallenge.jsx.
     await prisma.xssComment.create({
       data: { content: req.body?.content ?? '' }
     })
